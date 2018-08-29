@@ -45,12 +45,13 @@ heatmap.2 <- function (x,
                        vline=median(breaks),
                        linecol=tracecol,
 
-                       ## Row/Column Labeling
+                       ## Row/Column Labeling. APG: Added a cex.lab field to control for  x and y axis label sizes
                        margins = c(5, 5),
                        ColSideColors,
                        RowSideColors,
                        cexRow = 0.2 + 1/log10(nr),
                        cexCol = 0.2 + 1/log10(nc),
+                       cex.lab = 1,
                        labRow = NULL,
                        labCol = NULL,
                        srtRow = NULL,
@@ -91,6 +92,10 @@ heatmap.2 <- function (x,
                        ...
                        )
 {
+# Modifications done following: https://stackoverflow.com/questions/42251103/how-to-set-axis-label-size-in-gplots-heatmap-2
+# to be able to change the x and y axes size with cex
+require(gtools) # APG Added 
+plot.dendrogram = stats:::plot.dendrogram # APG added
   scale01 <- function(x, low=min(x), high=max(x) )
     {
       x <- (x-low)/(high - low)
@@ -527,10 +532,18 @@ heatmap.2 <- function (x,
 
 
 
-  ## add row and column headings (xlab, ylab)
-  if(!is.null(xlab)) mtext(xlab, side = 1, line = margins[1] - 1.25)
-  if(!is.null(ylab)) mtext(ylab, side = 4, line = margins[2] - 1.25)
-
+  ## add row and column headings (xlab, ylab) (APG commented the following lines)
+  #if(!is.null(xlab)) mtext(xlab, side = 1, line = margins[1] - 1.25)
+  #if(!is.null(ylab)) mtext(ylab, side = 4, line = margins[2] - 1.25)
+  ## Modification to include the new cex.lab field (APG)
+  cex.lab <- ifelse(invalid(match.call()$cex.lab), 1.0, match.call()$cex.lab)
+  if(!is.null(xlab)) mtext(xlab, side = 1,
+    line = margins[1] - 1.25 + cex.lab / 5,
+    cex = cex.lab)
+  if(!is.null(ylab)) mtext(ylab, side = 4,
+    line = margins[2] - 1.25 + cex.lab / 5,
+    cex = cex.lab)
+                       
   ## perform user-specified function
   if (!missing(add.expr))
     eval(substitute(add.expr))
